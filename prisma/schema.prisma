@@ -1,0 +1,68 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model user {
+  userId      Int     @id @default(autoincrement()) @map("user_id")
+  email        String  @unique @map("email")
+  password     String    @map("password")
+  name         String  @map("name")
+  role        String  @default("APPLICANT") @map("role")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  resumes resumes[]
+  resumes_log resumes_log[]
+  tokens tokens?
+
+  @@map("user")
+}
+
+model resumes {
+  resumeId    Int      @id @default(autoincrement()) @map("resume_id")
+  userId      Int      @map("user_id")
+  title     String   @map("title")
+  content   String   @map("content") @db.Text
+  status     String   @default("APPLY") @map("status")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user user @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  resumes_log resumes_log[]
+
+  @@map("resumes")
+}
+
+model resumes_log {
+  logId        Int      @id @default(autoincrement()) @map("log_id")
+  recruiterId    Int      @map("recruiter_id")
+  resumeId     Int   @map("resume_id")
+  oldStatus     String   @map("old_status")
+  newStatus     String   @map("new_status")
+  reason    String   @map("reason") @db.Text
+  createdAt DateTime @default(now()) @map("created_at")
+
+  resumes resumes @relation(fields: [resumeId], references: [resumeId], onDelete: Cascade)
+  user user @relation(fields: [recruiterId], references: [userId], onDelete: Cascade)
+
+  @@map("resumes_log")
+}
+
+model tokens {
+  tokenId    Int     @id @default(autoincrement()) @map("token_id")
+  userId    Int   @unique   @map("user_id")
+  refreshToken     String   @map("refresh_token")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user user @relation(fields: [userId], references: [userId], onDelete: Cascade)
+
+  @@map("tokens")
+}
