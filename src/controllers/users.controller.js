@@ -1,4 +1,5 @@
 import { GetUserService } from '../services/user.service.js';
+
 export class GetUserController{
 
     getUserService = new GetUserService();

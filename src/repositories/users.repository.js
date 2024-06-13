@@ -15,5 +15,25 @@ export class GetUserRepository{
         });
 
         return getUser;
-    }
+    };
+
+    isExistUser = async (email) => {
+        const findUser = await prisma.user.findFirst({
+            where: {email},
+        });
+
+        return findUser;
+    };
+
+    createUser = async (email, hashPassword, name) => {
+        const user = await prisma.user.create({
+            data: {
+                email,
+                password: hashPassword,
+                name,
+            },
+        });
+
+        return user;
+    };
 }
