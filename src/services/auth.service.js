@@ -9,11 +9,11 @@ export class AuthService{
         const isExistUser = await this.createUserRepository.isExistUser(email);
 
         if (isExistUser) {
-            return res.status(400).json({message: '이미 가입된 사용자입니다.'});
+            throw new Error('이미 가입된 사용자입니다.');
         };
 
         if (password != passwordConfirm) {
-            return res.status(400).json({message: '입력한 두 비밀번호가 일치하지 않습니다.'});
+            throw new Error('입력한 두 비밀번호가 일치하지 않습니다.');
         };
 
         const hashPassword = await bcrypt.hash(password, 10);
@@ -28,5 +28,48 @@ export class AuthService{
             createdAt: user.createdAt,
             updatedAt: user.updatedAt,
         };
-    }
+    };
+
+    loginUser = async (email, password) => {
+        const user = await this.createUserRepository.isExistUser(email);
+
+        if(!user) {
+            throw new Error('인증 정보와 일치하는 사용자가 없습니다.');
+        } else if (!(await bcrypt.compare(password, user.password))) {
+            throw new Error('비밀번호가 일치하지 않습니다.');
+        };
+
+        const accesstoken = jwt.sign(
+            { userId: user.userId },
+            's',
+            { expiresIn: '12h' }
+          );
+
+          const refreshtoken = jwt.sign(
+            { userId: user.userId },
+            'c',
+            { expiresIn: '7d' }
+          );
+
+          const hashRefreshToken = await bcrypt.hash(refreshtoken, 10);
+
+          const existingToken = await this.createUserRepository.findToken(user.userId);
+
+          if (existingToken) {
+            const updateUser = await this.createUserRepository.updateToken(user.userId, hashRefreshToken);
+
+            return {
+                userId: user.userId,
+                accesstoken: accesstoken,
+                refreshtoken: refreshtoken,
+            };
+          };
+
+          await this.createUserRepository.createToken(user.userId, hashRefreshToken);
+          return {
+            userId: user.userId,
+            accesstoken: accesstoken,
+            refreshtoken: refreshtoken,
+            };
+    };
 }

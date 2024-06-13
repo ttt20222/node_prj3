@@ -1,5 +1,4 @@
 import { AuthService } from '../services/auth.service.js';
-import bcrypt from 'bcrypt';
 import { createUser, loginUser } from '../routers/joi.js';
 
 export class AuthController{
@@ -25,7 +24,16 @@ export class AuthController{
     //로그인
     signIn = async (req, res, next) => {
         try{
+            const { email, password } = req.body;
 
+            await loginUser.validateAsync(req.body);
+
+            const user = await this.authService.loginUser(email, password);
+
+            res.setHeader('accesstoken', `Bearer ${user.accesstoken}`);
+            res.setHeader('refreshtoken', `Bearer ${user.refreshtoken}`);
+
+            return res.status(200).json({data:user});
         } catch(error){
             next(error);
         }

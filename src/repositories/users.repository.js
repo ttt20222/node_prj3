@@ -36,4 +36,28 @@ export class GetUserRepository{
 
         return user;
     };
+
+    findToken = async (userId) => {
+        const token = await prisma.tokens.findFirst({
+            where: {userId: userId},
+        });
+
+        return token;
+    };
+
+    updateToken = async (userId, hashRefreshToken) => {
+        await prisma.tokens.update({
+            where: {userId: userId},
+            data: { refreshToken: hashRefreshToken },
+        });
+    };
+
+    createToken = async (userId, hashRefreshToken) => {
+        await prisma.tokens.create({
+            data: {
+                userId : userId,
+                refreshToken: hashRefreshToken,
+            },
+        });
+    };
 }
