@@ -26,5 +26,23 @@ export class ResumeController{
         }catch(error){
             next(error);
         }
-    }
+    };
+
+    findResumes = async (req, res, next) => {
+        try{
+            const { sort, status } = req.query;
+            const { userId } = req.user;
+
+            const resumes = await this.resumeService.findResume(userId, sort, status);
+
+            return res.status(HTTP_STATUS.OK).json({
+                status: HTTP_STATUS.OK,
+                message: '이력서 목록 조회에 성공했습니다.',
+                data: resumes});
+
+        }catch(error){
+            next(error);
+        }
+    };
+
 }

@@ -12,112 +12,80 @@ const resumeController = new ResumeController();
 
 //이력서 생성 /resume
 router.post('/', authMiddleware, resumeController.createResume);
-  // try {
-  //   const { userId } = req.user;
-  //   const { title, content } = req.body;
-
-  //   await createResume.validateAsync(req.body);
-
-  //   const resume = await prisma.resumes.create({
-  //     data: {
-  //       userId: +userId,
-  //       title,
-  //       content,
-  //     },
-  //   });
-
-  //   const responseResume = {
-  //     resumeId: resume.resumeId,
-  //     userId: resume.userId,
-  //     title: resume.title,
-  //     content: resume.content,
-  //     status: resume.status,
-  //     createdAt: resume.createdAt,
-  //     updatedAt: resume.updatedAt,
-  //   };
-
-  //   return res.status(201).json({
-  //     staus: 201,
-  //     message: '이력서 생성에 성공했습니다.',
-  //     data: responseResume,
-  //   });
-  // } catch (error) {
-  //   next(error);
-  // }
 
 //이력서 목록 조회 /resume?sort=desc
-router.get('/', authMiddleware, async (req, res, next) => {
-  try {
-    const { sort, status } = req.query;
-    const { userId } = req.user;
+router.get('/', authMiddleware, resumeController.findResumes);
+//   try {
+//     const { sort, status } = req.query;
+//     const { userId } = req.user;
 
-    const filter = {
-      userId: +userId,
-    };
+//     const filter = {
+//       userId: +userId,
+//     };
 
-    if (status) {
-      filter.status = status;
-    }
+//     if (status) {
+//       filter.status = status;
+//     }
 
-    const sortOrder = sort ? sort.toLowerCase() : 'desc';
-    const orderBy = sortOrder === 'asc' ? 'asc' : 'desc';
+//     const sortOrder = sort ? sort.toLowerCase() : 'desc';
+//     const orderBy = sortOrder === 'asc' ? 'asc' : 'desc';
 
-    const user = await prisma.user.findFirst({
-      where: { userId: +userId },
-      select: { role: true },
-    });
+//     const user = await prisma.user.findFirst({
+//       where: { userId: +userId },
+//       select: { role: true },
+//     });
 
-    if (user.role === 'RECRUITER') {
-      delete filter.userId;
-    }
+//     if (user.role === 'RECRUITER') {
+//       delete filter.userId;
+//     }
 
-    const resume = await prisma.resumes.findMany({
-      select: {
-        resumeId: true,
-        user: {
-          select: {
-            name: true,
-          },
-        },
-        title: true,
-        content: true,
-        status: true,
-        createdAt: true,
-        updatedAt: true,
-      },
-      where: filter,
-      orderBy: {
-        createdAt: orderBy,
-      },
-    });
+//     const resume = await prisma.resumes.findMany({
+      // select: {
+      //   resumeId: true,
+      //   user: {
+      //     select: {
+      //       name: true,
+      //     },
+      //   },
+      //   title: true,
+      //   content: true,
+      //   status: true,
+      //   createdAt: true,
+      //   updatedAt: true,
+      // },
+      // where: filter,
+      // orderBy: {
+      //   createdAt: orderBy,
+      // },
+//     });
 
-    if (!resume) {
-      return res.status(200).json({
-        status: 200,
-        message: '일치하는 값이 없습니다.',
-        data: [],
-      });
-    }
+//     if (!resume) {
+//       return res.status(200).json({
+//         status: 200,
+//         message: '일치하는 값이 없습니다.',
+//         data: [],
+//       });
+//     }
 
-    const transformedResume = resume.map((x) => ({
-      resumeId: x.resumeId,
-      name: x.user.name,
-      title: x.title,
-      content: x.content,
-      status: x.status,
-      createdAt: x.createdAt,
-      updatedAt: x.updatedAt,
-    }));
+    // const transformedResume = resume.map((x) => ({
+    //   resumeId: x.resumeId,
+    //   name: x.user.name,
+    //   title: x.title,
+    //   content: x.content,
+    //   status: x.status,
+    //   createdAt: x.createdAt,
+    //   updatedAt: x.updatedAt,
+    // }));
 
-    return res.status(201).json({
-      status: 201,
-      message: '이력서 목록 조회에 성공했습니다.',
-      data: transformedResume,
-    });
-  } catch (error) {
-    next(error);
-  }
-});
+//     return res.status(201).json({
+//       status: 201,
+//       message: '이력서 목록 조회에 성공했습니다.',
+//       data: transformedResume,
+//     });
+//   } catch (error) {
+//     next(error);
+//   }
+// });
 
 //이력서 상세 조회 /resume/:resume_id
 router.get('/:resume_id', authMiddleware, async (req, res, next) => {
