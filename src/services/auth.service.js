@@ -74,4 +74,24 @@ export class AuthService{
             refreshtoken: refreshtoken,
             };
     };
+
+    updateRefreshToken = async (userId) => {
+        const accesstoken = jwt.sign(
+            { userId: userId },
+            ACCESS_TOKEN_SECRET_KEY,
+            { expiresIn: '12h' }
+          );
+
+          const refreshtoken = jwt.sign(
+            { userId: userId },
+            REFRESH_TOKEN_SECRET_KEY,
+            { expiresIn: '7d' }
+          );
+
+          const hashRefreshToken = await bcrypt.hash(refreshtoken, 10);
+
+          await this.createUserRepository.updateToken(userId, hashRefreshToken);
+
+          return { accesstoken, refreshtoken };
+    }
 }

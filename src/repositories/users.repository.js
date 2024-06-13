@@ -60,4 +60,15 @@ export class GetUserRepository{
             },
         });
     };
+
+    updateToken = async (userId, hashRefreshToken) => {
+        await prisma.tokens.update({
+            where: {
+              userId: +userId,
+            },
+            data: {
+              refreshToken: hashRefreshToken,
+            },
+          });
+    }
 }

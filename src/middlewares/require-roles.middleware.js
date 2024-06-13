@@ -7,10 +7,6 @@ export const requireRoles = (roles) => async (req, res, next) => {
     const { userId } = req.user;
 
     const user = await getUserRepository.findUser(userId);
-    // const user = await prisma.user.findFirst({
-    //   where: { userId: +userId },
-    //   select: { role: true },
-    // });
 
     if (!user || !roles.includes(user.role)) {
       throw new HttpError.Forbidden('접근 권한이 없습니다.');

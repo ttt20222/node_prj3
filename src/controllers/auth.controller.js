@@ -45,4 +45,23 @@ export class AuthController{
             next(error);
         }
     };
+
+    updateRefreshToken = async (req, res, next) => {
+        try {
+            const { userId } = req.user;
+
+            const token = await this.authService.updateRefreshToken(userId);
+
+            res.setHeader('accesstoken', `Bearer ${token.accesstoken}`);
+            res.setHeader('refreshtoken', `Bearer ${token.refreshtoken}`);
+
+            return res.status(HTTP_STATUS.CREATED).json({
+                status: HTTP_STATUS.CREATED,
+                message: '토큰 재발급에 성공했습니다.',
+                data: token});
+
+        }catch(error){
+            next(error);
+        }
+    };
 };
