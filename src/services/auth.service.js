@@ -2,6 +2,7 @@ import { GetUserRepository } from '../repositories/users.repository.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { ACCESS_TOKEN_SECRET_KEY, REFRESH_TOKEN_SECRET_KEY } from '../constants/env.constant.js';
+import { HttpError } from '../errors/http.error.js';
 
 export class AuthService{
     createUserRepository = new GetUserRepository();
@@ -10,11 +11,11 @@ export class AuthService{
         const isExistUser = await this.createUserRepository.isExistUser(email);
 
         if (isExistUser) {
-            throw new Error('이미 가입된 사용자입니다.');
+            throw new HttpError.Conflict('이미 가입된 사용자입니다.');
         };
 
         if (password != passwordConfirm) {
-            throw new Error('입력한 두 비밀번호가 일치하지 않습니다.');
+            throw new HttpError.Unauthorized('입력한 두 비밀번호가 일치하지 않습니다.');
         };
 
         const hashPassword = await bcrypt.hash(password, 10);
@@ -35,9 +36,9 @@ export class AuthService{
         const user = await this.createUserRepository.isExistUser(email);
 
         if(!user) {
-            throw new Error('인증 정보와 일치하는 사용자가 없습니다.');
+            throw new HttpError.Unauthorized('인증 정보와 일치하는 사용자가 없습니다.');
         } else if (!(await bcrypt.compare(password, user.password))) {
-            throw new Error('비밀번호가 일치하지 않습니다.');
+            throw new HttpError.Unauthorized('비밀번호가 일치하지 않습니다.');
         };
 
         const accesstoken = jwt.sign(

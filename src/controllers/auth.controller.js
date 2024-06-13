@@ -1,5 +1,6 @@
 import { AuthService } from '../services/auth.service.js';
 import { createUser, loginUser } from '../routers/joi.js';
+import { HTTP_STATUS } from '../constants/http-status.constant.js';
 
 export class AuthController{
 
@@ -14,7 +15,10 @@ export class AuthController{
 
             const createUsers = await this.authService.createUser(email, password, passwordConfirm, name);
 
-            return res.status(200).json({data:createUsers});
+            return res.status(HTTP_STATUS.CREATED).json({
+                status: HTTP_STATUS.CREATED,
+                message: '회원가입에 성공했습니다.',
+                data: createUsers});
 
         } catch(error){
             next(error);
@@ -33,7 +37,10 @@ export class AuthController{
             res.setHeader('accesstoken', `Bearer ${user.accesstoken}`);
             res.setHeader('refreshtoken', `Bearer ${user.refreshtoken}`);
 
-            return res.status(200).json({data:user});
+            return res.status(HTTP_STATUS.OK).json({
+                status: HTTP_STATUS.OK,
+                message: '로그인에 성공했습니다.',
+                data: user});
         } catch(error){
             next(error);
         }
