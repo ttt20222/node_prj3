@@ -31,6 +31,7 @@ export default async function (req, res, next) {
     req.user = user;
 
     next();
+    
   } catch (error) {
     next(error);
   }

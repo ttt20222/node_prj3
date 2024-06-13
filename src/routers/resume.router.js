@@ -2,46 +2,48 @@ import express from 'express';
 import { prisma } from '../utils/prisma.util.js';
 import { Prisma } from '@prisma/client';
 import authMiddleware from '../middlewares/require-access-token.middleware.js';
-import { createResume, updateResumeJoi, updateStatus } from './joi.js';
+import { updateResumeJoi, updateStatus } from './joi.js';
 import { requireRoles } from '../middlewares/require-roles.middleware.js';
+import { ResumeController } from '../controllers/resumes.controller.js';
 
 const router = express.Router();
 
+const resumeController = new ResumeController();
+
 //이력서 생성 /resume
-router.post('/', authMiddleware, async (req, res, next) => {
-  try {
-    const { userId } = req.user;
-    const { title, content } = req.body;
+router.post('/', authMiddleware, resumeController.createResume);
+  // try {
+  //   const { userId } = req.user;
+  //   const { title, content } = req.body;
 
-    await createResume.validateAsync(req.body);
+  //   await createResume.validateAsync(req.body);
 
-    const resume = await prisma.resumes.create({
-      data: {
-        userId: +userId,
-        title,
-        content,
-      },
-    });
+  //   const resume = await prisma.resumes.create({
+  //     data: {
+  //       userId: +userId,
+  //       title,
+  //       content,
+  //     },
+  //   });
 
-    const responseResume = {
-      resumeId: resume.resumeId,
-      userId: resume.userId,
-      title: resume.title,
-      content: resume.content,
-      status: resume.status,
-      createdAt: resume.createdAt,
-      updatedAt: resume.updatedAt,
-    };
+  //   const responseResume = {
+  //     resumeId: resume.resumeId,
+  //     userId: resume.userId,
+  //     title: resume.title,
+  //     content: resume.content,
+  //     status: resume.status,
+  //     createdAt: resume.createdAt,
+  //     updatedAt: resume.updatedAt,
+  //   };
 
-    return res.status(201).json({
-      staus: 201,
-      message: '이력서 생성에 성공했습니다.',
-      data: responseResume,
-    });
-  } catch (error) {
-    next(error);
-  }
-});
+  //   return res.status(201).json({
+  //     staus: 201,
+  //     message: '이력서 생성에 성공했습니다.',
+  //     data: responseResume,
+  //   });
+  // } catch (error) {
+  //   next(error);
+  // }
 
 //이력서 목록 조회 /resume?sort=desc
 router.get('/', authMiddleware, async (req, res, next) => {
