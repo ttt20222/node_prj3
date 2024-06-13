@@ -64,4 +64,20 @@ export class AuthController{
             next(error);
         }
     };
+
+    logOutUser = async (req, res, next) => {
+        try {
+            const { userId } = req.user;
+
+            await this.authService.logOutUser(userId);
+
+            return res.status(HTTP_STATUS.OK).json({
+                status: HTTP_STATUS.OK,
+                message: '로그아웃에 성공했습니다.',
+                userId: userId});
+
+        }catch(error){
+            next(error);
+        }
+    };
 };

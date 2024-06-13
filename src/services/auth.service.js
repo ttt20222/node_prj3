@@ -93,5 +93,9 @@ export class AuthService{
           await this.createUserRepository.updateToken(userId, hashRefreshToken);
 
           return { accesstoken, refreshtoken };
+    };
+
+    logOutUser = async (userId) => {
+        await this.createUserRepository.logOutUser(userId);
     }
 }

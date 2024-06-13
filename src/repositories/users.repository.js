@@ -70,5 +70,11 @@ export class GetUserRepository{
               refreshToken: hashRefreshToken,
             },
           });
+    };
+
+    logOutUser = async (userId) => {
+        await prisma.tokens.delete({
+            where: { userId: +userId },
+        });
     }
 }

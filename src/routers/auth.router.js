@@ -16,20 +16,6 @@ router.post('/sign-in', authController.signIn);
 router.post('/tokens', refreshMiddleware, authController.updateRefreshToken);
   
 //로그아웃 /auth/sign-out
-router.delete('/sign-out', refreshMiddleware, async (req, res, next) => {
-const { userId } = req.user;
-
-await prisma.tokens.delete({
-    where: { userId: +userId },
-});
-
-return res.status(200).json({
-    status: 200,
-    message: '로그아웃에 성공했습니다.',
-    data: {
-    id: userId,
-    },
-});
-});
+router.delete('/sign-out', refreshMiddleware, authController.logOutUser);
 
 export default router;
