@@ -124,4 +124,21 @@ export class ResumeService{
 
         return updateResume;
     };
+
+    deleteResumes = async (userId, resumeId) => {
+
+        const filter = {
+            userId: +userId,
+            resumeId: +resumeId,};
+
+        const resume = await this.resumeRepository.findUserResume(filter);
+
+        if (!resume) {
+            throw new HttpError.NotFound('이력서가 존재하지 않습니다.');
+        };
+
+        const deleteResume = await this.resumeRepository.deleteResumes(filter);
+
+        return deleteResume;
+    }
 }
