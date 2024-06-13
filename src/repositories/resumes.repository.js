@@ -116,4 +116,28 @@ export class ResumeRepository{
 
         return createdLog;
     };
+
+    getResumeLog = async (resumeId) => {
+        const resumesLog = await prisma.resumes_log.findMany({
+            where: { resumeId: +resumeId },
+            select: {
+              logId: true,
+              user: {
+                select: {
+                  name: true,
+                },
+              },
+              resumeId: true,
+              oldStatus: true,
+              newStatus: true,
+              reason: true,
+              createdAt: true,
+            },
+            orderBy: {
+              createdAt: 'desc',
+            },
+          });
+        
+        return resumesLog;
+    };
 }

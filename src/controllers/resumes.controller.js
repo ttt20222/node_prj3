@@ -122,4 +122,21 @@ export class ResumeController{
             next(error);
         }
     };
+
+    getResumeLog = async (req, res, next) => {
+        try {
+            const params = req.params;
+            const resumeId = params.resume_id;
+
+            const resumeLog = await this.resumeService.getLog(resumeId);
+
+            return res.status(HTTP_STATUS.OK).json({
+                status: HTTP_STATUS.OK,
+                message: '이력서 로그 목록 조회에 성공했습니다.',
+                data: resumeLog});
+
+        }catch(error){
+            next(error);
+        }
+    }
 }

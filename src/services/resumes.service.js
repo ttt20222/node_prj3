@@ -156,4 +156,24 @@ export class ResumeService{
 
         return updateStatus;
     };
+
+    getLog = async (resumeId) => {
+        const resumeLog = await this.resumeRepository.getResumeLog(resumeId);
+
+        if (!resumeLog) {
+            throw new HttpError.NotFound('이력서가 존재하지 않습니다.');
+        };
+
+        const transformedResumesLog = resumeLog.map((log) => ({
+            logId: log.logId,
+            recruiterName: log.user.name,
+            resumeId: log.resumeId,
+            oldStatus: log.oldStatus,
+            newStatus: log.newStatus,
+            reason: log.reason,
+            createdAt: log.createdAt,
+          }));
+
+        return transformedResumesLog;
+    }
 }
