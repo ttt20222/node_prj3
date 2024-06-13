@@ -1,6 +1,7 @@
 import { GetUserRepository } from '../repositories/users.repository.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import { ACCESS_TOKEN_SECRET_KEY, REFRESH_TOKEN_SECRET_KEY } from '../constants/env.constant.js';
 
 export class AuthService{
     createUserRepository = new GetUserRepository();
@@ -41,13 +42,13 @@ export class AuthService{
 
         const accesstoken = jwt.sign(
             { userId: user.userId },
-            's',
+            ACCESS_TOKEN_SECRET_KEY,
             { expiresIn: '12h' }
           );
 
           const refreshtoken = jwt.sign(
             { userId: user.userId },
-            'c',
+            REFRESH_TOKEN_SECRET_KEY,
             { expiresIn: '7d' }
           );
 
