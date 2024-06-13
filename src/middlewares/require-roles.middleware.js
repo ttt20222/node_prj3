@@ -1,19 +1,19 @@
-import { prisma } from '../utils/prisma.util.js';
+import { GetUserRepository } from '../repositories/users.repository.js';
+import { HttpError } from '../errors/http.error.js';
 
 export const requireRoles = (roles) => async (req, res, next) => {
   try {
+    const getUserRepository = new GetUserRepository();
     const { userId } = req.user;
 
-    const user = await prisma.user.findFirst({
-      where: { userId: +userId },
-      select: { role: true },
-    });
+    const user = await getUserRepository.findUser(userId);
+    // const user = await prisma.user.findFirst({
+    //   where: { userId: +userId },
+    //   select: { role: true },
+    // });
 
     if (!user || !roles.includes(user.role)) {
-      return res.status(403).json({
-        status: 403,
-        message: '접근 권한이 없습니다.',
-      });
+      throw new HttpError.Forbidden('접근 권한이 없습니다.');
     }
 
     next();

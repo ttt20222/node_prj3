@@ -43,11 +43,28 @@ export default function (err, req, res, next) {
         errorMessage = '유효하지 않은 지원 상태입니다.';
         break;
       default:
-        errorMessage = '에러';
+        errorMessage = '기타에러';
     }
-    return res.status(HttpError.BadRequest.status).json({
-      status: HttpError.BadRequest.status,
+    const badRequestError = new HttpError.BadRequest(errorMessage); 
+    return res.status(badRequestError.status).json({
+      status: badRequestError.status,
       errorMessage: errorMessage,
+    });
+  };
+
+  const unauthenciatedError = new HttpError.Unauthorized();
+
+  if (err.name === 'TokenExpiredError'){
+    res.status(unauthenciatedError.status).json({
+      status: unauthenciatedError.status,
+      message: '인증 정보가 만료되었습니다.',
+    });
+  };
+
+  if (err.name === 'JsonWebTokenError'){
+    res.status(unauthenciatedError.status).json({
+      status: unauthenciatedError.status,
+      message: '인증 정보가 유효하지 않습니다.',
     });
   };
 
