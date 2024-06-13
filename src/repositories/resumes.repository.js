@@ -14,7 +14,7 @@ export class ResumeRepository{
     };
 
     findResumes = async (orderBy, filter) => {
-        const resume = await prisma.resumes.findMany({
+        const resume = await prisma.resumes.findFirst({
             select: {
                 resumeId: true,
                 user: {
@@ -35,5 +35,26 @@ export class ResumeRepository{
         });
 
         return resume;
-    }
+    };
+
+    findUserResume = async (filter) => {
+        const resume = await prisma.resumes.findFirst({
+            select: {
+                resumeId: true,
+                user: {
+                  select: {
+                    name: true,
+                  },
+                },
+                title: true,
+                content: true,
+                status: true,
+                createdAt: true,
+                updatedAt: true,
+              },
+              where: filter,
+        });
+
+        return resume;
+    };
 }

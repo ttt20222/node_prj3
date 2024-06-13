@@ -15,20 +15,13 @@ router.post('/', authMiddleware, resumeController.createResume);
 
 //이력서 목록 조회 /resume?sort=desc
 router.get('/', authMiddleware, resumeController.findResumes);
+
+//이력서 상세 조회 /resume/:resume_id
+router.get('/:resume_id', authMiddleware, resumeController.findUserResume);
 //   try {
-//     const { sort, status } = req.query;
 //     const { userId } = req.user;
-
-//     const filter = {
-//       userId: +userId,
-//     };
-
-//     if (status) {
-//       filter.status = status;
-//     }
-
-//     const sortOrder = sort ? sort.toLowerCase() : 'desc';
-//     const orderBy = sortOrder === 'asc' ? 'asc' : 'desc';
+//     const params = req.params;
+//     const resumeId = params.resume_id;
 
 //     const user = await prisma.user.findFirst({
 //       where: { userId: +userId },
@@ -36,159 +29,95 @@ router.get('/', authMiddleware, resumeController.findResumes);
 //     });
 
 //     if (user.role === 'RECRUITER') {
-//       delete filter.userId;
-//     }
+//       const allResume = await prisma.resumes.findFirst({
+//         select: {
+//           resumeId: true,
+//           user: {
+//             select: {
+//               name: true,
+//             },
+//           },
+//           title: true,
+//           content: true,
+//           status: true,
+//           createdAt: true,
+//           updatedAt: true,
+//         },
+//         where: {
+//           resumeId: +resumeId,
+//         },
+//       });
 
-//     const resume = await prisma.resumes.findMany({
-      // select: {
-      //   resumeId: true,
-      //   user: {
-      //     select: {
-      //       name: true,
-      //     },
-      //   },
-      //   title: true,
-      //   content: true,
-      //   status: true,
-      //   createdAt: true,
-      //   updatedAt: true,
-      // },
-      // where: filter,
-      // orderBy: {
-      //   createdAt: orderBy,
-      // },
-//     });
+//       if (!allResume) {
+//         return res.status(400).json({
+//           status: 400,
+//           message: '이력서가 존재하지 않습니다.',
+//         });
+//       }
 
-//     if (!resume) {
-//       return res.status(200).json({
-//         status: 200,
-//         message: '일치하는 값이 없습니다.',
-//         data: [],
+//       const transformedResume = {
+//         resumeId: allResume.resumeId,
+//         name: allResume.user.name,
+//         title: allResume.title,
+//         content: allResume.content,
+//         status: allResume.status,
+//         createdAt: allResume.createdAt,
+//         updatedAt: allResume.updatedAt,
+//       };
+
+//       return res.status(201).json({
+//         status: 201,
+//         message: '이력서 상세 조회에 성공했습니다.',
+//         data: transformedResume,
 //       });
 //     }
 
-    // const transformedResume = resume.map((x) => ({
-    //   resumeId: x.resumeId,
-    //   name: x.user.name,
-    //   title: x.title,
-    //   content: x.content,
-    //   status: x.status,
-    //   createdAt: x.createdAt,
-    //   updatedAt: x.updatedAt,
-    // }));
+//     const resume = await prisma.resumes.findFirst({
+    //   select: {
+    //     resumeId: true,
+    //     user: {
+    //       select: {
+    //         name: true,
+    //       },
+    //     },
+    //     title: true,
+    //     content: true,
+    //     status: true,
+    //     createdAt: true,
+    //     updatedAt: true,
+    //   },
+    //   where: {
+    //     resumeId: +resumeId,
+    //     userId: +userId,
+    //   },
+    // });
+
+//     if (!resume) {
+//       return res.status(400).json({
+//         status: 400,
+//         message: '이력서가 존재하지 않습니다.',
+//       });
+//     }
+
+//     const transformedResume = {
+//       resumeId: resume.resumeId,
+//       name: resume.user.name,
+//       title: resume.title,
+//       content: resume.content,
+//       status: resume.status,
+//       createdAt: resume.createdAt,
+//       updatedAt: resume.updatedAt,
+//     };
 
 //     return res.status(201).json({
 //       status: 201,
-//       message: '이력서 목록 조회에 성공했습니다.',
+//       message: '이력서 상세 조회에 성공했습니다.',
 //       data: transformedResume,
 //     });
 //   } catch (error) {
 //     next(error);
 //   }
 // });
-
-//이력서 상세 조회 /resume/:resume_id
-router.get('/:resume_id', authMiddleware, async (req, res, next) => {
-  try {
-    const { userId } = req.user;
-    const params = req.params;
-    const resumeId = params.resume_id;
-
-    const user = await prisma.user.findFirst({
-      where: { userId: +userId },
-      select: { role: true },
-    });
-
-    if (user.role === 'RECRUITER') {
-      const allResume = await prisma.resumes.findFirst({
-        select: {
-          resumeId: true,
-          user: {
-            select: {
-              name: true,
-            },
-          },
-          title: true,
-          content: true,
-          status: true,
-          createdAt: true,
-          updatedAt: true,
-        },
-        where: {
-          resumeId: +resumeId,
-        },
-      });
-
-      if (!allResume) {
-        return res.status(400).json({
-          status: 400,
-          message: '이력서가 존재하지 않습니다.',
-        });
-      }
-
-      const transformedResume = {
-        resumeId: allResume.resumeId,
-        name: allResume.user.name,
-        title: allResume.title,
-        content: allResume.content,
-        status: allResume.status,
-        createdAt: allResume.createdAt,
-        updatedAt: allResume.updatedAt,
-      };
-
-      return res.status(201).json({
-        status: 201,
-        message: '이력서 상세 조회에 성공했습니다.',
-        data: transformedResume,
-      });
-    }
-
-    const resume = await prisma.resumes.findFirst({
-      select: {
-        resumeId: true,
-        user: {
-          select: {
-            name: true,
-          },
-        },
-        title: true,
-        content: true,
-        status: true,
-        createdAt: true,
-        updatedAt: true,
-      },
-      where: {
-        resumeId: +resumeId,
-        userId: +userId,
-      },
-    });
-
-    if (!resume) {
-      return res.status(400).json({
-        status: 400,
-        message: '이력서가 존재하지 않습니다.',
-      });
-    }
-
-    const transformedResume = {
-      resumeId: resume.resumeId,
-      name: resume.user.name,
-      title: resume.title,
-      content: resume.content,
-      status: resume.status,
-      createdAt: resume.createdAt,
-      updatedAt: resume.updatedAt,
-    };
-
-    return res.status(201).json({
-      status: 201,
-      message: '이력서 상세 조회에 성공했습니다.',
-      data: transformedResume,
-    });
-  } catch (error) {
-    next(error);
-  }
-});
 
 //이력서 수정 /resume/:resume_id
 router.patch('/:resume_id', authMiddleware, async (req, res, next) => {

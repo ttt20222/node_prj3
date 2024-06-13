@@ -55,5 +55,52 @@ export class ResumeService{
           }));
 
         return transformedResume;
+    };
+
+    findUserResumes = async (userId, resumeId) => {
+        const user = await this.getUserRepository.findUser(userId);
+
+        const filter = {
+            userId: +userId,
+            resumeId: +resumeId,};
+
+        if (user.role === 'RECRUITER') {
+            delete filter.userId;
+            const resume = await this.resumeRepository.findUserResume(filter);
+            
+            if (!resume) {
+                throw new HttpError.NotFound('이력서가 존재하지 않습니다.');
+            };
+    
+            const transformedResume = {
+                resumeId: resume.resumeId,
+                name: resume.user.name,
+                title: resume.title,
+                content: resume.content,
+                status: resume.status,
+                createdAt: resume.createdAt,
+                updatedAt: resume.updatedAt,
+            };
+    
+            return transformedResume;
+        };
+
+        const resume = await this.resumeRepository.findUserResume(filter);
+
+        if (!resume) {
+            throw new HttpError.NotFound('이력서가 존재하지 않습니다.');
+        };
+
+        const transformedResume = {
+            resumeId: resume.resumeId,
+            name: resume.user.name,
+            title: resume.title,
+            content: resume.content,
+            status: resume.status,
+            createdAt: resume.createdAt,
+            updatedAt: resume.updatedAt,
+        };
+
+        return transformedResume;
     }
 }

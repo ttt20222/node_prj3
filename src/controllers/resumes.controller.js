@@ -45,4 +45,22 @@ export class ResumeController{
         }
     };
 
+    findUserResume = async (req, res, next) => {
+        try{
+            const { userId } = req.user;
+            const params = req.params;
+            const resumeId = params.resume_id;
+
+            const resume = await this.resumeService.findUserResumes(userId, resumeId);
+
+            return res.status(HTTP_STATUS.OK).json({
+                status: HTTP_STATUS.OK,
+                message: '이력서 상세 조회에 성공했습니다.',
+                data: resume});
+
+        }catch(error){
+            next(error);
+        }
+    };
+
 }
