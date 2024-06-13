@@ -63,4 +63,25 @@ export class ResumeController{
         }
     };
 
+    updateResume = async (req, res, next) => {
+        try{
+            const { userId } = req.user;
+            const params = req.params;
+            const resumeId = params.resume_id;
+            const { title, content } = req.body;
+
+            await updateResumeJoi.validateAsync(req.body);
+
+            const resume = await this.resumeService.updateResumes(userId, resumeId, title, content);
+
+            return res.status(HTTP_STATUS.CREATED).json({
+                status: HTTP_STATUS.CREATED,
+                message: '이력서 수정에 성공했습니다.',
+                data: resume});
+
+        }catch(error){
+            next(error);
+        }
+    };
+
 }

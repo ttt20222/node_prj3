@@ -102,5 +102,26 @@ export class ResumeService{
         };
 
         return transformedResume;
-    }
+    };
+
+    updateResumes = async (userId, resumeId, title, content) => {
+
+        if (!title && !content) {
+            throw new HttpError.BadRequest('수정할 정보를 입력해 주세요.');
+        };
+
+        const filter = {
+            userId: +userId,
+            resumeId: +resumeId,};
+
+        const resume = await this.resumeRepository.findUserResume(filter);
+        
+        if (!resume) {
+            throw new HttpError.NotFound('이력서가 존재하지 않습니다.');
+        };
+
+        const updateResume = await this.resumeRepository.updateResumes(filter, title, content);
+
+        return updateResume;
+    };
 }

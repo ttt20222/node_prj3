@@ -57,4 +57,16 @@ export class ResumeRepository{
 
         return resume;
     };
+
+    updateResumes = async (filter, title, content) => {
+        const resume = await prisma.resumes.update({
+            where: filter,
+              data: {
+                title: title || resume.title,
+                content: content || resume.content,
+              },
+        });
+
+        return resume;
+    };
 }
