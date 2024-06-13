@@ -1,8 +1,6 @@
 import express from 'express';
 import { prisma } from '../utils/prisma.util.js';
-import { Prisma } from '@prisma/client';
 import authMiddleware from '../middlewares/require-access-token.middleware.js';
-import { updateResumeJoi, updateStatus } from './joi.js';
 import { requireRoles } from '../middlewares/require-roles.middleware.js';
 import { ResumeController } from '../controllers/resumes.controller.js';
 
@@ -27,72 +25,8 @@ router.delete('/:resume_id', authMiddleware, resumeController.deleteResume);
 
 
 //이력서 지원 상태 변경 /resume/:resume_id/status
-router.patch(
-  '/:resume_id/status',
-  authMiddleware,
-  requireRoles(['RECRUITER']),
-  async (req, res, next) => {
-    try {
-      const { userId } = req.user;
-      const params = req.params;
-      const resumeId = params.resume_id;
+router.patch('/:resume_id/status', authMiddleware, requireRoles(['RECRUITER']), resumeController.changeStatus);
 
-      const { status, reason } = req.body;
-
-      await updateStatus.validateAsync(req.body);
-
-      const resume = await prisma.resumes.findFirst({
-        where: { resumeId: +resumeId },
-      });
-
-      if (!resume) {
-        return res.status(400).json({
-          status: 400,
-          message: '이력서가 존재하지 않습니다.',
-        });
-      }
-
-      const [updatedResume, createdLog] = await prisma.$transaction(
-        async (tx) => {
-          const previousResume = await tx.resumes.findFirst({
-            where: { resumeId: +resumeId },
-            select: { status: true },
-          });
-
-          const updatedResume = await tx.resumes.update({
-            where: { resumeId: +resumeId },
-            data: {
-              status: status,
-            },
-          });
-
-          const createdLog = await tx.resumes_log.create({
-            data: {
-              recruiterId: userId,
-              resumeId: updatedResume.resumeId,
-              oldStatus: previousResume.status,
-              newStatus: updatedResume.status,
-              reason,
-            },
-          });
-
-          return [updatedResume, createdLog];
-        },
-        {
-          isolationLevel: Prisma.TransactionIsolationLevel.ReadCommitted,
-        }
-      );
-
-      return res.status(201).json({
-        status: 201,
-        message: '이력서 지원 상태 변경에 성공했습니다.',
-        data: createdLog,
-      });
-    } catch (error) {
-      next(error);
-    }
-  }
-);
 
 //이력서 로그 목록 조회 /resume/:resume_id/log
 router.get(

@@ -100,5 +100,26 @@ export class ResumeController{
         }catch(error){
             next(error);
         }
-    }
+    };
+
+    changeStatus = async (req, res, next) => {
+        try {
+            const { userId } = req.user;
+            const params = req.params;
+            const resumeId = params.resume_id;
+            const { status, reason } = req.body;
+
+            await updateStatus.validateAsync(req.body);
+
+            const resume = await this.resumeService.updateStatus(userId, resumeId, status, reason);
+
+            return res.status(HTTP_STATUS.CREATED).json({
+                status: HTTP_STATUS.CREATED,
+                message: '이력서 지원 상태 변경에 성공했습니다.',
+                data: resume});
+
+        }catch(error){
+            next(error);
+        }
+    };
 }

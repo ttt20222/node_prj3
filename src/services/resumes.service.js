@@ -140,5 +140,20 @@ export class ResumeService{
         const deleteResume = await this.resumeRepository.deleteResumes(filter);
 
         return deleteResume;
-    }
+    };
+
+    updateStatus = async (userId, resumeId, status, reason) => {
+        const filter = {
+            resumeId: +resumeId,};
+
+        const resume = await this.resumeRepository.findUserResume(filter);
+
+        if (!resume) {
+            throw new HttpError.NotFound('이력서가 존재하지 않습니다.');
+        };
+
+        const updateStatus = await this.resumeRepository.updateStatus(userId, resumeId, status, reason);
+
+        return updateStatus;
+    };
 }

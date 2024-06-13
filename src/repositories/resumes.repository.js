@@ -1,4 +1,5 @@
 import { prisma } from "../utils/prisma.util.js";
+import { Prisma } from '@prisma/client';
 
 export class ResumeRepository{
     createResumes = async (userId, title, content) => {
@@ -79,5 +80,40 @@ export class ResumeRepository{
         });
 
         return resume;
+    };
+
+    updateStatus = async (userId, resumeId, status, reason) => {
+        const [updatedResume, createdLog] = await prisma.$transaction(
+            async (tx) => {
+              const previousResume = await tx.resumes.findFirst({
+                where: { resumeId: +resumeId },
+                select: { status: true },
+              });
+    
+              const updatedResume = await tx.resumes.update({
+                where: { resumeId: +resumeId },
+                data: {
+                  status: status,
+                },
+              });
+    
+              const createdLog = await tx.resumes_log.create({
+                data: {
+                  recruiterId: userId,
+                  resumeId: updatedResume.resumeId,
+                  oldStatus: previousResume.status,
+                  newStatus: updatedResume.status,
+                  reason,
+                },
+              });
+    
+              return [updatedResume, createdLog];
+            },
+            {
+              isolationLevel: Prisma.TransactionIsolationLevel.ReadCommitted,
+            }
+          );
+
+        return createdLog;
     };
 }
