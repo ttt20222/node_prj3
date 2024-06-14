@@ -1,10 +1,11 @@
-import { ResumeService } from '../services/resumes.service.js';
 import { HTTP_STATUS } from '../constants/http-status.constant.js';
 import { createResume, updateResumeJoi, updateStatus } from '../routers/joi.js';
 
 export class ResumeController{
 
-    resumeService = new ResumeService();
+    constructor(resumeService) {
+        this.resumeService = resumeService;
+    }
 
     createResume = async (req, res, next) => {
         try{

@@ -1,9 +1,12 @@
-import { prisma } from "../utils/prisma.util.js";
 import { Prisma } from '@prisma/client';
 
 export class ResumeRepository{
+  constructor(prisma) {
+    this.prisma = prisma;
+  }
+
     createResumes = async (userId, title, content) => {
-        const createResume = await prisma.resumes.create({
+        const createResume = await this.prisma.resumes.create({
             data: {
                 userId: +userId,
                 title,
@@ -15,7 +18,7 @@ export class ResumeRepository{
     };
 
     findResumes = async (orderBy, filter) => {
-        const resume = await prisma.resumes.findFirst({
+        const resume = await this.prisma.resumes.findFirst({
             select: {
                 resumeId: true,
                 user: {
@@ -39,7 +42,7 @@ export class ResumeRepository{
     };
 
     findUserResume = async (filter) => {
-        const resume = await prisma.resumes.findFirst({
+        const resume = await this.prisma.resumes.findFirst({
             select: {
                 resumeId: true,
                 user: {
@@ -60,7 +63,7 @@ export class ResumeRepository{
     };
 
     updateResumes = async (filter, title, content) => {
-        const resume = await prisma.resumes.update({
+        const resume = await this.prisma.resumes.update({
             where: filter,
               data: {
                 title: title || resume.title,
@@ -72,7 +75,7 @@ export class ResumeRepository{
     };
 
     deleteResumes = async (filter) => {
-        const resume = await prisma.resumes.delete({
+        const resume = await this.prisma.resumes.delete({
             where: filter,
               select: {
                 resumeId: true,
@@ -83,7 +86,7 @@ export class ResumeRepository{
     };
 
     updateStatus = async (userId, resumeId, status, reason) => {
-        const [updatedResume, createdLog] = await prisma.$transaction(
+        const [updatedResume, createdLog] = await this.prisma.$transaction(
             async (tx) => {
               const previousResume = await tx.resumes.findFirst({
                 where: { resumeId: +resumeId },
@@ -118,7 +121,7 @@ export class ResumeRepository{
     };
 
     getResumeLog = async (resumeId) => {
-        const resumesLog = await prisma.resumes_log.findMany({
+        const resumesLog = await this.prisma.resumes_log.findMany({
             where: { resumeId: +resumeId },
             select: {
               logId: true,

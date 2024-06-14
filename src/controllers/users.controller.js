@@ -1,10 +1,11 @@
-import { GetUserService } from '../services/user.service.js';
 import { HTTP_STATUS } from '../constants/http-status.constant.js';
 
 //내정보 조회
 export class GetUserController{
 
-    getUserService = new GetUserService();
+    constructor(getUserService) {
+        this.getUserService = getUserService;
+    }
     
     getUser = async (req, res, next) => {
         try{

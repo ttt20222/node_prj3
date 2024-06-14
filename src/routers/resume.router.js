@@ -2,10 +2,15 @@ import express from 'express';
 import authMiddleware from '../middlewares/require-access-token.middleware.js';
 import { requireRoles } from '../middlewares/require-roles.middleware.js';
 import { ResumeController } from '../controllers/resumes.controller.js';
+import { prisma } from '../utils/prisma.util.js';
+import { ResumeRepository } from '../repositories/resumes.repository.js';
+import { ResumeService } from '../services/resumes.service.js';
 
 const router = express.Router();
 
-const resumeController = new ResumeController();
+const resumeRepository = new ResumeRepository(prisma);
+const resumeService = new ResumeService(resumeRepository);
+const resumeController = new ResumeController(resumeService);
 
 //이력서 생성 /resume
 router.post('/', authMiddleware, resumeController.createResume);

@@ -1,7 +1,7 @@
-import { GetUserRepository } from '../repositories/users.repository.js';
-
 export class GetUserService{
-    getUserRepository = new GetUserRepository();
+    constructor(getUserRepository) {
+        this.getUserRepository = getUserRepository;
+    }
 
     findUser = async (userId) => {
         const getUser = await this.getUserRepository.findUser(userId);

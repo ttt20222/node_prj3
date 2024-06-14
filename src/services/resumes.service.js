@@ -1,10 +1,11 @@
-import { ResumeRepository } from '../repositories/resumes.repository.js';
-import { GetUserRepository } from '../repositories/users.repository.js';
 import { HttpError } from '../errors/http.error.js';
 
 export class ResumeService{
-    resumeRepository = new ResumeRepository();
-    getUserRepository = new GetUserRepository();
+
+    constructor(resumeRepository, getUserRepository) {
+        this.resumeRepository = resumeRepository;
+        this.getUserRepository = getUserRepository;
+    }
 
     createResume = async (userId, title, content) => {
         
