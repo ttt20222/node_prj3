@@ -5,7 +5,9 @@ import { ACCESS_TOKEN_SECRET_KEY, REFRESH_TOKEN_SECRET_KEY } from '../constants/
 import { HttpError } from '../errors/http.error.js';
 
 export class AuthService{
-    createUserRepository = new GetUserRepository();
+    constructor(createUserRepository) {
+        this.createUserRepository = createUserRepository;
+    }
 
     createUser = async (email, password, passwordConfirm, name) => {
         const isExistUser = await this.createUserRepository.isExistUser(email);

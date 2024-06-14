@@ -1,8 +1,10 @@
-import { prisma } from "../utils/prisma.util.js";
-
 export class GetUserRepository{
+    constructor (prisma) {
+        this.prisma = prisma;
+    }
+
     findUser = async (userId) => {
-        const getUser = await prisma.user.findFirst({
+        const getUser = await this.prisma.user.findFirst({
             where: { userId : +userId},
             select : {
                 userId: true,
@@ -18,7 +20,7 @@ export class GetUserRepository{
     };
 
     isExistUser = async (email) => {
-        const findUser = await prisma.user.findFirst({
+        const findUser = await this.prisma.user.findFirst({
             where: {email},
         });
 
@@ -26,7 +28,7 @@ export class GetUserRepository{
     };
 
     createUser = async (email, hashPassword, name) => {
-        const user = await prisma.user.create({
+        const user = await this.prisma.user.create({
             data: {
                 email,
                 password: hashPassword,
@@ -38,7 +40,7 @@ export class GetUserRepository{
     };
 
     findToken = async (userId) => {
-        const token = await prisma.tokens.findFirst({
+        const token = await this.prisma.tokens.findFirst({
             where: {userId: userId},
         });
 
@@ -46,14 +48,14 @@ export class GetUserRepository{
     };
 
     updateToken = async (userId, hashRefreshToken) => {
-        await prisma.tokens.update({
+        await this.prisma.tokens.update({
             where: {userId: userId},
             data: { refreshToken: hashRefreshToken },
         });
     };
 
     createToken = async (userId, hashRefreshToken) => {
-        await prisma.tokens.create({
+        await this.prisma.tokens.create({
             data: {
                 userId : userId,
                 refreshToken: hashRefreshToken,
@@ -62,7 +64,7 @@ export class GetUserRepository{
     };
 
     updateToken = async (userId, hashRefreshToken) => {
-        await prisma.tokens.update({
+        await this.prisma.tokens.update({
             where: {
               userId: +userId,
             },
@@ -73,7 +75,7 @@ export class GetUserRepository{
     };
 
     logOutUser = async (userId) => {
-        await prisma.tokens.delete({
+        await this.prisma.tokens.delete({
             where: { userId: +userId },
         });
     }
