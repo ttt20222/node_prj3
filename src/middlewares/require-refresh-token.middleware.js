@@ -3,10 +3,11 @@ import bcrypt from 'bcrypt';
 import { REFRESH_TOKEN_SECRET_KEY } from '../constants/env.constant.js';
 import { GetUserRepository } from '../repositories/users.repository.js';
 import { HttpError } from '../errors/http.error.js';
+import { prisma } from '../utils/prisma.util.js';
 
 export default async function (req, res, next) {
   try {
-    const getUserRepository = new GetUserRepository();
+    const getUserRepository = new GetUserRepository(prisma);
 
     const refreshtoken = req.headers.authorization;
 
