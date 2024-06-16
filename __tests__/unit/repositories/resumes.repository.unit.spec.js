@@ -1,11 +1,12 @@
 import { beforeEach, describe, jest, test, expect } from '@jest/globals';
 import { ResumeRepository } from '../../../src/repositories/resumes.repository.js';
+import { dummyResumes } from '../../dummies/resumes.dummy.js';
 
 const mockPrisma = {
   resumes: {
     create: jest.fn(),
+    findFirst: jest.fn(),
     findMany: jest.fn(),
-    findUnique: jest.fn(),
     update: jest.fn(),
     delete: jest.fn(),
   },
@@ -18,10 +19,34 @@ describe('ResumeRepository Unit Test', () => {
     jest.resetAllMocks(); // 모든 Mock을 초기화합니다
   });
 
-  test('create Method', async () => {
+  test('createResumes Method', async () => {
     // GIVEN
+    const { userId, title, content } = dummyResumes[0];
+    const mockReturn = {
+    userId,
+    title,
+    content,
+    status: 'APPLICANT',
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    };
+    mockPrisma.resumes.create.mockReturnValue(mockReturn);
+
     // WHEN
+    const actualResult = await resumeRepository.createResumes(userId,title,content);
+
     // THEN
+    const expectedResult = mockReturn;
+
+    expect(mockPrisma.resumes.create).toHaveBeenCalledTimes(1);
+    expect(mockPrisma.resumes.create).toHaveBeenCalledWith({
+    data: {
+        userId,
+        title,
+        content,
+    },
+    });
+    expect(actualResult).toEqual(expectedResult);
   });
 
   test('readMany Method', async () => {
